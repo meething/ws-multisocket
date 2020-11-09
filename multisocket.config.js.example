@@ -1,0 +1,13 @@
+module.exports = {
+  apps : [{
+    name: 'ws-multisocket',
+    script: 'server.js',
+    watch: true,
+    env: {
+      SSL : true,
+      SSLKEY : 'cert/privkey.pem',
+      SSLCERT  : 'cert/fullchain.pem',
+      DEBUG : true
+    }
+  }]
+};

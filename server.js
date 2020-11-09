@@ -15,16 +15,19 @@ config.options = {}
 if (!process.env.hasOwnProperty('SSL')||process.env.SSL == false) {
   var server = http.createServer();
   server.listen(process.env.PORT || 3000);
+  if (debug) console.log("HTTP server started",process.env.PORT);
 } else {
-  config.options.key= process.env.SSLKEY ? fs.readFileSync(process.env.SSLKEY) : false,
-  config.options.cert= process.env.SSLCERT ? fs.readFileSync(process.env.SSLCERT) :  false
+  config.options.key = process.env.SSLKEY ? fs.readFileSync(process.env.SSLKEY) : false;
+  config.options.cert = process.env.SSLCERT ? fs.readFileSync(process.env.SSLCERT) :  false;
   var server = https.createServer(config.options);
   server.listen(process.env.PORT || 443);
+  if (debug) console.log("HTTPS server started",process.env.PORT);
 }
 
 // LRU with last used sockets
 const QuickLRU = require("quick-lru");
 const lru = new QuickLRU({ maxSize: 1000, onEviction: false });
+if (debug) console.log("LRU initialized");
 
 server.on("upgrade", async function(request, socket, head) {
   let parsed = url.parse(request.url,true);
