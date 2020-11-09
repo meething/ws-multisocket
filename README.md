@@ -23,9 +23,6 @@ Configure the options in `multisocket.config.js` and launch using pm2:
 pm2 start multisocket.config.js
 ```
 
-[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/import/github/https://github.com/meething/gundb-multisocket/gundb-multisocket)
-
-
 ###### Credits
 This project is a component of [Gun Meething](https://github.com/meething/webrtc-gun) powered by [GunDB](https://gun.eco)
 
