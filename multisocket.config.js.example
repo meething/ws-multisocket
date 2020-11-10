@@ -4,7 +4,8 @@ module.exports = {
     script: 'server.js',
     watch: true,
     env: {
-      SSL : true,
+      HOST : '0.0.0.0',
+      PORT: 443,
       SSLKEY : 'cert/privkey.pem',
       SSLCERT  : 'cert/fullchain.pem',
       DEBUG : true
