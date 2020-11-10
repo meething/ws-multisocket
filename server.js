@@ -11,6 +11,9 @@ const QuickLRU = require("quick-lru");
 const lru = new QuickLRU({ maxSize: 1000, onEviction: false });
 if (debug) console.log("LRU initialized");
 
+const fs = require("fs");
+const html = fs.readFileSync("index.html", "utf8");
+
 const uWS = require('uWebSockets.js');
 const port = process.env.PORT || 443;
 const host = process.env.HOST || '127.0.0.1';
@@ -53,8 +56,30 @@ const app = uWS.SSLApp({
     /* The library guarantees proper unsubscription at close */
     if (debug) console.log('closed',code,message);
   }
+}).post('/:cmd/:path/:key', (res, req) => {
+  /* Note that you cannot read from req after returning from here */
+  let url  = req.getUrl().replace(/^\/|\/$/g, '');
+  var cmd  = req.getParameter(0);
+  var path = req.getParameter(1);
+  var key  = req.getParameter(2);
+  console.log('post',path,key);
+  if(cmd=="set"){
+	  /* Read the body until done or error */
+	  readJson(res, (obj) => {
+	    if (debug) console.log('POST query for ' + url + ': ', obj);
+	    try { lru.set(path, obj); } catch(e){ console.log(e); }
+	    res.writeStatus('200 OK').end('Stored');
+	  }, () => {
+	    if (debug) console.log('Invalid JSON or no data at all!');
+	    res.writeStatus('500').end();
+	  });
+  } else if (cmd =="get"){
+	    try { res.end(JSON.stringify(lru.get(path))); } catch(e){ console.log(e); }
+  } else {  res.end('invalid command'); }
+
 }).any('/*', (res, req) => {
-  res.end('Nothing to see here!');
+  res.end(html);
+  // res.end('Nothing to see here!');
 }).listen(host, port, (token) => {
   if (token) {
     console.log('Listening to port ' + port);
@@ -62,3 +87,44 @@ const app = uWS.SSLApp({
     console.log('Failed to listen to port ' + port);
   }
 });
+
+
+/* Helper function for reading a posted JSON body */
+function readJson(res, cb, err) {
+  let buffer;
+  /* Register data cb */
+  res.onData((ab, isLast) => {
+    let chunk = Buffer.from(ab);
+    if (isLast) {
+      let json;
+      if (buffer) {
+        try {
+          json = JSON.parse(Buffer.concat([buffer, chunk]));
+        } catch (e) {
+          /* res.close calls onAborted */
+          res.close();
+          return;
+        }
+        cb(json);
+      } else {
+        try {
+          json = JSON.parse(chunk);
+        } catch (e) {
+          /* res.close calls onAborted */
+          res.close();
+          return;
+        }
+        cb(json);
+      }
+    } else {
+      if (buffer) {
+        buffer = Buffer.concat([buffer, chunk]);
+      } else {
+        buffer = Buffer.concat([chunk]);
+      }
+    }
+  });
+
+  /* Register error cb */
+  res.onAborted(err);
+}
