@@ -22,7 +22,7 @@ const app = uWS.SSLApp({
   /* Options */
   compression: 0,
   maxPayloadLength: 16 * 1024 * 1024,
-  idleTimeout: 10,
+  idleTimeout: 3600,
 
   /* Handlers */
   upgrade: (res, req, context) => { // a request was made to open websocket, res req have all the properties for the request, cookies etc
