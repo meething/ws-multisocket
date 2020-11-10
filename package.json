@@ -1,17 +1,16 @@
 {
   "name": "ws-multisocket",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Lorenzo Mangani <lorenzo.mangani@gmail.com>",
-  "description": "Serve multiple Gun WS instances over a single HTTP socket",
+  "description": "Serve multiple uWS instances over a single HTTP socket",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "hyperswarm": "^2.13.0",
     "quick-lru": "^5.1.0",
-    "ws": "^7.2.5",
-    "hyperswarm": "^2.13.0"
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v18.8.0"
   },
   "engines": {
     "node": "12.x"
@@ -21,8 +20,8 @@
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch",
-    "express"
+    "meething",
+    "websockets",
+    "wss"
   ]
 }
