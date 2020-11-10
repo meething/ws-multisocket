@@ -9,6 +9,7 @@ let debug = process.env.DEBUG || true;
 // LRU with last used sockets
 const QuickLRU = require("quick-lru");
 const lru = new QuickLRU({ maxSize: 1000, onEviction: false });
+const swarms = new QuickLRU({ maxSize: 1000, onEviction: false });
 if (debug) console.log("LRU initialized");
 
 const fs = require("fs");
@@ -23,7 +24,7 @@ const app = uWS.SSLApp({
   cert_file_name: process.env.SSLCERT
 }).ws('/*', {
   /* Options */
-  compression: 0,
+  compression: uWS.SHARED_COMPRESSOR, //0
   maxPayloadLength: 16 * 1024 * 1024,
   idleTimeout: 3600,
 
@@ -50,21 +51,22 @@ const app = uWS.SSLApp({
     ws.publish(ws.path, message, isBinary);
   },
   drain: (ws) => {
-
+    console.log('WebSocket backpressure: ' + ws.getBufferedAmount());
   },
   close: (ws, code, message) => {
     /* The library guarantees proper unsubscription at close */
     if (debug) console.log('closed',code,message);
   }
 }).post('/:cmd/:path/:key', (res, req) => {
-  /* Note that you cannot read from req after returning from here */
   let url  = req.getUrl().replace(/^\/|\/$/g, '');
+  console.log('post',url);
+  /* temporary POST cache for testing, to be redesigned */
+  /* set/path/key { json } */
+  /* get/path/key { json } */
   var cmd  = req.getParameter(0);
   var path = req.getParameter(1);
   var key  = req.getParameter(2);
-  console.log('post',path,key);
   if(cmd=="set"){
-	  /* Read the body until done or error */
 	  readJson(res, (obj) => {
 	    if (debug) console.log('POST query for ' + url + ': ', obj);
 	    try { lru.set(path, obj); } catch(e){ console.log(e); }
@@ -75,11 +77,11 @@ const app = uWS.SSLApp({
 	  });
   } else if (cmd =="get"){
 	    try { res.end(JSON.stringify(lru.get(path))); } catch(e){ console.log(e); }
-  } else {  res.end('invalid command'); }
+  } else {  res.writeStatus('404').end(); }
 
 }).any('/*', (res, req) => {
   res.end(html);
-  // res.end('Nothing to see here!');
+
 }).listen(host, port, (token) => {
   if (token) {
     console.log('Listening to port ' + port);
@@ -87,7 +89,6 @@ const app = uWS.SSLApp({
     console.log('Failed to listen to port ' + port);
   }
 });
-
 
 /* Helper function for reading a posted JSON body */
 function readJson(res, cb, err) {

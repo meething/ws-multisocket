@@ -3,7 +3,9 @@
   <title>WebSocket Echo Test</title>
   <script language="javascript" type="text/javascript">
 
-  var wsUri = "wss://"+window.location.hostname+"/broadcast";
+  let r = Math.random().toString(36).substring(7);
+  var message = "Meething Rocks! @"+r;
+  var wsUri = "wss://"+window.location.hostname+"/"+r;
   var output;
 
   function init()
@@ -23,18 +25,20 @@
 
   function onOpen(evt)
   {
-    writeToScreen("CONNECTED");
-    doSend("Meething Rocks!");
+    writeToScreen("WSS CONNECTED");
+    doSend(message);
   }
 
   function onClose(evt)
   {
-    writeToScreen("DISCONNECTED");
+    writeToScreen("WSS DISCONNECTED");
   }
 
   function onMessage(evt)
   {
     writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+    if (evt.data == message) { writeToScreen('<span style="color: green;">ECHO TEST SUCCESSFUL!</span>'); }
+    else { writeToScreen('<span style="color: red;">ECHO TEST FAILED!</span>'); }
     websocket.close();
   }
 
