@@ -70,9 +70,9 @@ const app = uWS.SSLApp({
 	  readJson(res, (obj) => {
 	    if (debug) console.log('POST query for ' + url + ': ', obj);
 	    try { lru.set(path, obj); } catch(e){ console.log(e); }
-	    res.writeStatus('200 OK').end('Stored');
+	    res.writeStatus('200 OK').end('Stored\r\n');
 	  }, () => {
-	    if (debug) console.log('Invalid JSON or no data at all!');
+	    if (debug) console.log('Invalid JSON\r\n');
 	    res.writeStatus('500').end();
 	  });
   } else if (cmd =="get"){
@@ -80,6 +80,7 @@ const app = uWS.SSLApp({
   } else {  res.writeStatus('404').end(); }
 
 }).any('/*', (res, req) => {
+  /* echo test */
   res.end(html);
 
 }).listen(host, port, (token) => {
