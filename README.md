@@ -1,7 +1,7 @@
 <img src="https://i.imgur.com/XS79fTC.png" width=200> <img width="100" alt="mozilla-builders" src="https://user-images.githubusercontent.com/1423657/81992335-85346480-9643-11ea-8754-8275e98e06bc.png">
 
 #### WSS MultiSocket
-Single `HTTP/S` server providing multiple ephemeral `WebSocket` instances with  path based routing and mesh isolation.
+Single `HTTP/S` server providing multiple ephemeral `WebSocket` instances with path based routing and mesh isolation.
 
 ### Configuration
 * requires a valid set of SSL/TLS certificates _(letsencrypt)_
@@ -15,7 +15,7 @@ npm install
 #### npm
 Explode your ENV variables manually and launch using npm:
 ```
-SSL=true SSLKEY=/path/to/privkey.pem SSLCERT=/path/to/fullchain.pem npm start
+PORT=443 SSLKEY=/path/to/privkey.pem SSLCERT=/path/to/fullchain.pem npm start
 ```
 #### pm2
 Configure the options in `multisocket.config.js` and launch using pm2:
